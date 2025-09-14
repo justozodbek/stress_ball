@@ -166,98 +166,15 @@ document.addEventListener("mouseout", (e) => {
     const y = ballProps("y");
     const vx = tracker.get("x");
     const vy = tracker.get("y");
-
+    
     // Apply a velocity boost in the direction the mouse was moving
     const boostFactor = 2.0; // Increase boost for more dramatic effect
-
+    
     // Force end the drag operation
     draggable.endDrag(e);
     isCurrentlyDragging = false;
-
+    
     // Animate the bounce with boosted velocity
     animateBounce(x, y, vx * boostFactor, vy * boostFactor);
   }
 });
-
-// Telegram WebApp integratsiyasi
-let tg = window.Telegram.WebApp;
-
-// Telegram ilovasi ishga tushganda
-tg.ready();
-tg.expand(); // To'liq ekranni egallash
-
-// Foydalanuvchi ma'lumotlarini olish
-const user = tg.initDataUnsafe.user;
-if (user) {
-    console.log("User:", user.first_name, user.last_name);
-}
-
-// Telegram tugmalari uchun funksiyalar
-document.getElementById('share-btn').addEventListener('click', function() {
-    const rotation = gsap.getProperty(ball, "rotation");
-    const score = Math.abs(Math.round(rotation / 360));
-
-    tg.showPopup({
-        title: "Your Score",
-        message: `You've spun the ball ${score} full rotations!`,
-        buttons: [{ type: 'ok' }]
-    });
-
-    // Do'stlarga ulashish imkoniyati
-    tg.sendData(JSON.stringify({
-        action: "share_score",
-        score: score
-    }));
-});
-
-document.getElementById('close-btn').addEventListener('click', function() {
-    tg.close();
-});
-
-// Tema moslamalari
-function applyTheme(theme) {
-    if (theme === 'dark') {
-        document.documentElement.style.setProperty('--color-1', '#854ade');
-        document.documentElement.style.setProperty('--color-2', '#62596f');
-    } else {
-        document.documentElement.style.setProperty('--color-1', '#5ea132');
-        document.documentElement.style.setProperty('--color-2', '#465040');
-    }
-}
-
-// Telegram parametrlarini o'qish
-const themeParams = tg.themeParams;
-if (themeParams.bg_color) {
-    applyTheme(themeParams.bg_color === '#212121' ? 'dark' : 'light');
-}
-
-// Telegram tugmasi ko'rinishini sozlash
-tg.MainButton.setParams({
-    text: 'SPIN RECORD: 0',
-    color: '#854ade',
-    text_color: '#ffffff'
-});
-
-// Aylanishlar sonini hisoblash va yangilash
-let rotationCount = 0;
-let lastRotation = 0;
-
-function updateRotationCounter() {
-    const currentRotation = gsap.getProperty(ball, "rotation");
-    const fullRotations = Math.floor(Math.abs(currentRotation) / 360);
-
-    if (fullRotations > rotationCount) {
-        rotationCount = fullRotations;
-        tg.MainButton.setText(`SPIN RECORD: ${rotationCount}`);
-
-        if (rotationCount > 0 && rotationCount % 5 === 0) {
-            tg.HapticFeedback.impactOccurred('heavy');
-        }
-    }
-
-    lastRotation = currentRotation;
-    requestAnimationFrame(updateRotationCounter);
-}
-
-// Rotation counter ni ishga tushirish
-updateRotationCounter();
